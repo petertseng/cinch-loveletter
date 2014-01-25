@@ -1,3 +1,15 @@
+# Copyright 2014 Peter Tseng
+#
+# This file is part of the Love Letter plugin for Cinch.
+# This program is released under the MIT License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the MIT License for more details.
+#
+# You should have received a copy of the MIT License along with this program.
+# If not, see <http://opensource.org/licenses/MIT>
+
 require 'loveletter/game'
 
 describe LoveLetter::Game do
