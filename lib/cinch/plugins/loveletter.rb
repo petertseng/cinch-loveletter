@@ -62,13 +62,17 @@ module Cinch; module Plugins; class LoveLetter
         next unless user.idle > @idle_timer_length
 
         channel = Channel(channel_name)
-        game.remove_player(pn)
-        channel.send("#{pn} has left the game: #{game.size} players.")
-        @players[pn].delete(game)
+        remove_from_game(channel, game, user)
         user.send("You have been removed from the #{channel_name} game " +
                   "due to inactivity.")
       }
     }
+  end
+
+  def remove_from_game(channel, game, user)
+    game.remove_player(user.name)
+    channel.send("#{user.name} has left the game: #{game.size} players.")
+    @players[user.name].delete(game)
   end
 
   def join(m, channel_name)
@@ -147,9 +151,7 @@ module Cinch; module Plugins; class LoveLetter
       return
     end
 
-    game.remove_player(m.user.name)
-    channel.send("#{m.user.name} has left the game: #{game.size} players.")
-    @players[m.user.name].delete(game)
+    remove_from_game(channel, game, m.user)
   end
 
   GOAL_REGEX = /goal(\d+)/
