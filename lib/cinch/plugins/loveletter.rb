@@ -32,6 +32,8 @@ module Cinch; module Plugins; class LoveLetter
 
   match(/play(?:\s+(#\w+))?\s+(\w+)(?:\s+(.*))?/i, method: :play_card)
 
+  listen_to :leaving, method: :remove_if_not_started
+
   def halp(m)
     m.reply("!join, !leave, !start, !reset, !play, !settings")
     m.reply("Too lazy to write real help")
@@ -73,6 +75,14 @@ module Cinch; module Plugins; class LoveLetter
     game.remove_player(user.name)
     channel.send("#{user.name} has left the game: #{game.size} players.")
     @players[user.name].delete(game)
+  end
+
+  def remove_if_not_started(m, user)
+    game = @games[m.channel.name]
+    return unless game
+    return if game.in_progress?
+
+    remove_from_game(m.channel, game, user)
   end
 
   def join(m, channel_name)
