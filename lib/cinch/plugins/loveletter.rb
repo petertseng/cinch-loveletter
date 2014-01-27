@@ -72,7 +72,8 @@ module Cinch; module Plugins; class LoveLetter
   end
 
   def remove_from_game(channel, game, user)
-    game.remove_player(user.name)
+    left = game.remove_player(user.name)
+    return if left.nil?
     channel.send("#{user.name} has left the game: #{game.size} players.")
     @players[user.name].delete(game)
   end
