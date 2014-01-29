@@ -23,7 +23,7 @@ module Cinch; module Plugins; class LoveLetter
   match(/join(?:\s+(#\w+))?/i, method: :join)
   match(/leave(?:\s+(#\w+))?/i, method: :leave)
 
-  match(/settings(?:\s+(#\w+))?\s+(.*)/i, method: :settings)
+  match(/settings(?:\s+(#\w+))?(?:\s+(.*))?/i, method: :settings)
 
   match(/start(?:\s+(#\w+))?/i, method: :start_game)
   match(/reset(?:\s+(#\w+))?/i, method: :reset_game)
