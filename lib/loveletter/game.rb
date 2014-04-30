@@ -166,15 +166,15 @@ module LoveLetter; class Game
   end
 
   def has_player?(p)
-    @players.include?(p)
+    @players.include?(p.downcase)
   end
 
   def add_player(p)
-    @players[p] = Player.new(p, @channel_name)
+    @players[p.downcase] = Player.new(p, @channel_name)
   end
 
   def remove_player(p)
-    @players.delete(p)
+    @players.delete(p.downcase)
   end
 
   def active_player_name
@@ -182,7 +182,7 @@ module LoveLetter; class Game
   end
 
   def alive?(p)
-    @players[p] && @players[p].alive?
+    @players[p.downcase] && @players[p.downcase].alive?
   end
 
   def round_winner(round)
@@ -378,11 +378,11 @@ module LoveLetter; class Game
   end
 
   def hand(player_name)
-    @players[player_name].hand
+    @players[player_name.downcase].hand
   end
 
   def legal_plays(player_name)
-    p = @players[player_name]
+    p = @players[player_name.downcase]
     return [Card.new(7)] if p.ministered?
     p.hand.uniq(&:id)
   end
@@ -391,7 +391,7 @@ module LoveLetter; class Game
 
   def resolve_name(name)
     #TODO do some spellcheck
-    if (p = @players[name]) && p.alive?
+    if (p = @players[name.downcase]) && p.alive?
       p
     else
       nil
