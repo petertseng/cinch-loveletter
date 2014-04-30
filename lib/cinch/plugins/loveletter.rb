@@ -35,8 +35,9 @@ module Cinch; module Plugins; class LoveLetter
   listen_to :leaving, method: :remove_if_not_started
 
   def halp(m)
-    m.reply("!join, !leave, !start, !reset, !play, !settings")
-    m.reply("Too lazy to write real help")
+    m.reply('!join, !leave, !start, !reset, !play: Do the obvious.')
+    m.reply('!settings [args]: Without arguments, displays current settings. With arguments (goalX, 7death, 7discard) changes settings.')
+    m.reply('!players: Shows history of cards played this round.')
   end
 
   def initialize(*args)
