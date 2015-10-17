@@ -22,8 +22,8 @@ Here's an example of what your *bot.rb* might look like:
           Cinch::Plugins::LoveLetter,
         ]
         c.plugins.options[Cinch::Plugins::LoveLetter] = {
-          :channels     => ["#playloveletter"],
-          :allowed_idle => 900,
+          :channels  => ["#playloveletter"],
+          :settings  => 'loveletter-settings.yaml',
         }
       end
 
