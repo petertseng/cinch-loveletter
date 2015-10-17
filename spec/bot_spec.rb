@@ -27,10 +27,14 @@ describe Cinch::Plugins::LoveLetter do
     :allowed_idle => 300,
   }}
   let(:bot) {
-    make_bot(Cinch::Plugins::LoveLetter, opts) { |c|
-      self.loggers.stub('debug') { nil }
+    b = make_bot(described_class, opts) { |c|
+      self.loggers.first.level = :warn
     }
+    # No, c.nick = 'testbot' doesn't work because... isupport?
+    allow(b).to receive(:nick).and_return('testbot')
+    b
   }
+  let(:plugin) { bot.plugins.first }
 
   it 'makes a test bot' do
     expect(bot).to be_a Cinch::Bot
@@ -48,14 +52,12 @@ describe Cinch::Plugins::LoveLetter do
     }}
 
     before :each do
-      bot.stub(:nick).and_return('testbot')
+      allow(plugin).to receive(:Channel).with(channel1).and_return(chan)
+      allow(plugin).to receive(:User).with(player1).and_return(user1)
+      allow(plugin).to receive(:User).with(player2).and_return(user2)
 
-      bot.plugins[0].stub(:Channel).with(channel1).and_return(chan)
-      bot.plugins[0].stub(:User).with(player1).and_return(user1)
-      bot.plugins[0].stub(:User).with(player2).and_return(user2)
-
-      chan.stub(:has_user?) { |u| players.keys.include?(u.nick) }
-      chan.stub(:name).and_return(channel1)
+      allow(chan).to receive(:has_user?) { |u| players.keys.include?(u.nick) }
+      allow(chan).to receive(:name).and_return(channel1)
 
       get_replies(make_message(bot, "!join #{channel1}", nick: player1))
       get_replies(make_message(bot, "!join #{channel1}", nick: player2))
