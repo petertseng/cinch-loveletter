@@ -9,7 +9,7 @@ This is an IRC bot using [cinch](https://github.com/cinchrb/cinch) and [cinch-ga
 Here's an example of what your *bot.rb* might look like:
 
     require 'cinch'
-    require './cinch-loveletter/lib/cinch/plugins/loveletter'
+    require 'cinch/plugins/loveletter'
 
     bot = Cinch::Bot.new do
 
