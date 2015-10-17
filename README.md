@@ -30,3 +30,10 @@ Here's an example of what your *bot.rb* might look like:
     end
 
     bot.start
+
+## Notes
+
+Unfortunately, unlike the other game bots, this repo has both the game logic and bot in a single repo.
+It would be super easy to separate them since they're in separate directories.
+The code was written too long ago and there's too little interest in this to justify that effort though.
+If anyone is interested, file an issue and it can be discussed.
