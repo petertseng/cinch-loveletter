@@ -24,7 +24,7 @@ describe Cinch::Plugins::LoveLetter do
 
   let(:opts) {{
     :channels => [channel1],
-    :allowed_idle => 300,
+    :settings => '/dev/null',
   }}
   let(:bot) {
     b = make_bot(described_class, opts) { |c|
@@ -53,15 +53,14 @@ describe Cinch::Plugins::LoveLetter do
 
     before :each do
       allow(plugin).to receive(:Channel).with(channel1).and_return(chan)
-      allow(plugin).to receive(:User).with(player1).and_return(user1)
-      allow(plugin).to receive(:User).with(player2).and_return(user2)
 
       allow(chan).to receive(:has_user?) { |u| players.keys.include?(u.nick) }
       allow(chan).to receive(:name).and_return(channel1)
+      allow(chan).to receive(:voice)
 
       get_replies(make_message(bot, "!join #{channel1}", nick: player1))
       get_replies(make_message(bot, "!join #{channel1}", nick: player2))
-      get_replies(make_message(bot, "!start #{channel1}", nick: player1))
+      get_replies(make_message(bot, '!start', nick: player1, channel: channel1))
     end
 
     it 'allows the !players command' do
