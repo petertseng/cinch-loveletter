@@ -11,15 +11,13 @@
 # If not, see <http://opensource.org/licenses/MIT>
 
 module LoveLetter; class Player
-  attr_reader :name
+  attr_reader :user
   attr_reader :rounds_won
   attr_reader :alive
   attr_accessor :protected
 
-  def initialize(name, channel_name)
-    @name = name
-    @channel_name = channel_name
-
+  def initialize(user)
+    @user = user
     @rounds_won = 0
   end
 
@@ -32,10 +30,15 @@ module LoveLetter; class Player
 
   alias :alive? :alive
   alias :protected? :protected
-  alias :to_s :name
+
+  def to_s
+    @user.to_s
+  end
+
+  alias :name :to_s
 
   def card
-    raise "#{@name} has more than one card" unless @hand.size == 1
+    raise "#{self} has more than one card" unless @hand.size == 1
     @hand[0]
   end
 
@@ -90,7 +93,7 @@ module LoveLetter; class Player
   end
 
   def win_round
-    raise "How did #{@name} win while dead?" unless @alive
+    raise "How did #{self} win while dead?" unless @alive
     @rounds_won += 1
   end
 

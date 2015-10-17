@@ -16,6 +16,10 @@ require 'loveletter/card'
 require 'loveletter/player'
 
 module LoveLetter; class Game
+  GAME_NAME = 'Love Letter'.freeze
+  MIN_PLAYERS = 2
+  MAX_PLAYERS = 4
+
   BASE_DECK = [
     [Card.new(1)] * 5,
     [Card.new(2)] * 2,
@@ -37,6 +41,7 @@ module LoveLetter; class Game
   attr_accessor :minister_death
 
   alias :in_progress? :in_progress
+  alias :started? :in_progress
 
   def initialize(channel_name)
     @channel_name = channel_name
@@ -157,32 +162,48 @@ module LoveLetter; class Game
     @players.size
   end
 
-  def full?
-    @players.size == 4
-  end
-
-  def players
+  def users
     @players.keys
   end
 
-  def has_player?(p)
-    @players.include?(p.downcase)
+  def has_player?(user)
+    @players.values.any? { |p| p.user == user }
   end
 
-  def add_player(p)
-    @players[p.downcase] = Player.new(p, @channel_name)
+  def find_player(user)
+    @players[user]
   end
 
-  def remove_player(p)
-    @players.delete(p.downcase)
+  def add_player(user)
+    raise "Cannot add #{user} to #{@channel_name}: game in progress" if @in_progress
+    return false if has_player?(user)
+    new_player = Player.new(user)
+    @players[user] = new_player
+    true
   end
 
-  def active_player_name
-    @round_player_order[0].name
+  def remove_player(user)
+    raise "Cannot remove #{user} from #{@channel_name}: game in progress" if @in_progress
+    return false unless @players.has_key?(user)
+    @players.delete(user)
+    true
   end
 
-  def alive?(p)
-    @players[p.downcase] && @players[p.downcase].alive?
+  def replace_player(replaced, replacing)
+    player = find_player(replaced)
+    return false unless player
+    player.user = replacing
+    @players.delete(replaced)
+    @players[replacing] = player
+    true
+  end
+
+  def active_user
+    @round_player_order[0].user
+  end
+
+  def alive?(user)
+    @players[user] && @players[user].alive?
   end
 
   def round_winner(round)
@@ -202,11 +223,12 @@ module LoveLetter; class Game
   end
 
   # Returns [success, public text, private text]
-  def play_card(player_name, card, args)
-    unless player_name == active_player_name
+  def play_card(user, card, args)
+    player_name = user.to_s
+    unless user == active_user
       return [false, nil, {player_name => 'You must wait your turn.'}]
     end
-    player = resolve_name(player_name)
+    player = find_player(user)
 
     id = card.to_i
     index = player.hand.index { |c| c.id == id }
@@ -377,12 +399,12 @@ module LoveLetter; class Game
     [true, pubtext, privtext]
   end
 
-  def hand(player_name)
-    @players[player_name.downcase].hand
+  def hand(user)
+    @players[user].hand
   end
 
-  def legal_plays(player_name)
-    p = @players[player_name.downcase]
+  def legal_plays(user)
+    p = @players[user]
     return [Card.new(7)] if p.ministered?
     p.hand.uniq(&:id)
   end
@@ -390,12 +412,8 @@ module LoveLetter; class Game
   private
 
   def resolve_name(name)
-    #TODO do some spellcheck
-    if (p = @players[name.downcase]) && p.alive?
-      p
-    else
-      nil
-    end
+    player = @players.values.find { |p| p.to_s == name }
+    player && player.alive? ? player : nil
   end
 
   def win_round(winner)
