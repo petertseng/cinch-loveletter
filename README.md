@@ -2,9 +2,7 @@
 
 ## Description
 
-This is a Cinch plugin to enable your bot to moderate Love Letter.
-
-http://boardgamegeek.com/boardgame/129622/love-letter
+This is an IRC bot using [cinch](https://github.com/cinchrb/cinch) and [cinch-game-bot](https://github.com/petertseng/cinch-game-bot) to allow play-by-IRC of [Love Letter](http://boardgamegeek.com/boardgame/129622/love-letter)
 
 ## Usage
 
