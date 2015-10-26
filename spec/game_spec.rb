@@ -10,9 +10,11 @@
 # You should have received a copy of the MIT License along with this program.
 # If not, see <http://opensource.org/licenses/MIT>
 
+require 'spec_helper'
+
 require 'loveletter/game'
 
-describe LoveLetter::Game do
+RSpec.describe LoveLetter::Game do
   Card = LoveLetter::Card
 
   before :each do

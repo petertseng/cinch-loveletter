@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 require 'cinch/test'
 require 'cinch/plugins/loveletter'
 
@@ -17,7 +19,7 @@ def get_replies_text(m)
   get_replies(m).map(&:text)
 end
 
-describe Cinch::Plugins::LoveLetter do
+RSpec.describe Cinch::Plugins::LoveLetter do
   include Cinch::Test
 
   let(:channel1) { '#test' }
