@@ -26,7 +26,7 @@ module Cinch; module Plugins; class LoveLetter < GameBot
 
   match(/play\s+(\w+)(?:\s+(.*))?/i, method: :play_card)
 
-  common_commands
+  add_common_commands
 
   def halp(m)
     m.reply('!join, !leave, !start, !play: Do the obvious.')
