@@ -54,11 +54,10 @@ module LoveLetter; class Game
 
   def reset
     @in_progress = false
-
-    @players = {}
   end
 
-  def start_game(rigged_deck: nil, rigged_order: nil)
+  def start_game(users, rigged_deck: nil, rigged_order: nil)
+    @players = users.map { |user| [user, Player.new(user)] }.to_h
     @in_progress = true
     @round = 0
 
@@ -166,27 +165,8 @@ module LoveLetter; class Game
     @players.keys
   end
 
-  def has_player?(user)
-    @players.values.any? { |p| p.user == user }
-  end
-
   def find_player(user)
     @players[user]
-  end
-
-  def add_player(user)
-    raise "Cannot add #{user} to #{@channel_name}: game in progress" if @in_progress
-    return false if has_player?(user)
-    new_player = Player.new(user)
-    @players[user] = new_player
-    true
-  end
-
-  def remove_player(user)
-    raise "Cannot remove #{user} from #{@channel_name}: game in progress" if @in_progress
-    return false unless @players.has_key?(user)
-    @players.delete(user)
-    true
   end
 
   def replace_player(replaced, replacing)

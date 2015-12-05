@@ -42,8 +42,8 @@ module Cinch; module Plugins; class LoveLetter < GameBot
     ::LoveLetter::Game
   end
 
-  def do_start_game(m, game, options)
-    game.start_game
+  def do_start_game(m, game, players, options)
+    game.start_game(players.map(&:user))
     channel = Channel(game.channel_name)
     channel.send('The game has started. Settings: ' + game_settings(game))
     channel.send("Turn order: #{game.player_order.join(', ')}")
@@ -113,14 +113,14 @@ module Cinch; module Plugins; class LoveLetter < GameBot
 
   def player_history(m)
     game = self.game_of(m)
-    return unless game && game.started? && game.has_player?(m.user)
+    return unless game && game.started? && game.users.include?(m.user)
 
     m.reply(game.player_history)
   end
 
   def play_card(m, card, args)
     game = self.game_of(m)
-    return unless game && game.started? && game.has_player?(m.user)
+    return unless game && game.started? && game.users.include?(m.user)
 
     success, pubtext, privtext = game.play_card(m.user, card, args)
 
