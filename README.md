@@ -36,4 +36,8 @@ Here's an example of what your *bot.rb* might look like:
 Unfortunately, unlike the other game bots, this repo has both the game logic and bot in a single repo.
 It would be super easy to separate them since they're in separate directories.
 The code was written too long ago and there's too little interest in this to justify that effort though.
-If anyone is interested, file an issue and it can be discussed.
+
+In general, this code is not regularly maintained.
+The tests were last known to pass on Cinch 2.3.1 and cinch-game-bot c7d9f837475b.
+Compatibility with later versions of either gem is not guaranteed.
+Full functional testing was not performed, only that the tests passed.
