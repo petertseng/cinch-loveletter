@@ -38,6 +38,6 @@ It would be super easy to separate them since they're in separate directories.
 The code was written too long ago and there's too little interest in this to justify that effort though.
 
 In general, this code is not regularly maintained.
-The tests were last known to pass on Cinch 2.3.1 and cinch-game-bot c7d9f837475b.
+The tests were last known to pass on Cinch 2.3.1 and cinch-game-bot f689a0c2ab8d.
+A quick run through of a game was performed as well to ensure that the game was at least functional.
 Compatibility with later versions of either gem is not guaranteed.
-Full functional testing was not performed, only that the tests passed.
