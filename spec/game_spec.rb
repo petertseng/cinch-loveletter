@@ -17,19 +17,20 @@ require 'loveletter/game'
 RSpec.describe LoveLetter::Game do
   Card = LoveLetter::Card
 
-  before :each do
-    @game = LoveLetter::Game.new('testchannel')
-    @game.goal_score = 1
+  def example_game(players, deck, order = nil, minister_death: false)
+    LoveLetter::Game.new(
+      'testchannel',
+      players,
+      minister_death: minister_death,
+      rigged_deck: deck,
+      rigged_order: order || players
+    )
   end
 
   # ===== General tests =====
 
   it 'forbids playing a card not in hand' do
-    @game.start_game(
-      %w(p1 p2),
-      rigged_deck: [1, 1, 1, 1, 2, 3, 2, 3],
-      rigged_order: ['p1', 'p2']
-    )
+    @game = example_game(%w(p1 p2), [1, 1, 1, 1, 2, 3, 2, 3])
     @game.draw
     expect(@game.deck_size).to be == 1
 
@@ -39,11 +40,7 @@ RSpec.describe LoveLetter::Game do
   end
 
   it 'forbids playing out of turn' do
-    @game.start_game(
-      %w(p1 p2),
-      rigged_deck: [1, 1, 1, 1, 2, 3, 2, 3],
-      rigged_order: ['p1', 'p2']
-    )
+    @game = example_game(%w(p1 p2), [1, 1, 1, 1, 2, 3, 2, 3])
     @game.draw
     expect(@game.deck_size).to be == 1
 
@@ -53,11 +50,7 @@ RSpec.describe LoveLetter::Game do
   end
 
   it 'calculates the winner after the last card is played' do
-    @game.start_game(
-      %w(p1 p2),
-      rigged_deck: [1, 1, 1, 1, 2, 3, 2],
-      rigged_order: ['p1', 'p2']
-    )
+    @game = example_game(%w(p1 p2), [1, 1, 1, 1, 2, 3, 2])
     @game.draw
     expect(@game.deck_size).to be == 0
 
@@ -72,11 +65,7 @@ RSpec.describe LoveLetter::Game do
 
   context 'when playing a 1' do
     before :each do
-      @game.start_game(
-        %w(p1 p2),
-        rigged_deck: [1, 1, 1, 1, 1, 3, 2],
-        rigged_order: ['p1', 'p2']
-      )
+      @game = example_game(%w(p1 p2), [1, 1, 1, 1, 1, 3, 2])
       @game.draw
       expect(@game.deck_size).to be == 0
 
@@ -125,11 +114,7 @@ RSpec.describe LoveLetter::Game do
   end
 
   it 'does not kill when playing 1 on protected player' do
-    @game.start_game(
-      %w(p1 p2),
-      rigged_deck: [1, 1, 1, 1, 4, 1, 3, 2],
-      rigged_order: ['p1', 'p2']
-    )
+    @game = example_game(%w(p1 p2), [1, 1, 1, 1, 4, 1, 3, 2])
     @game.draw
     expect(@game.deck_size).to be == 1
 
@@ -150,11 +135,7 @@ RSpec.describe LoveLetter::Game do
   # ===== Tests with 2 =====
 
   it 'forbids self-targeting with a 2' do
-    @game.start_game(
-      %w(p1 p2),
-      rigged_deck: [1, 1, 1, 1, 2, 3, 1],
-      rigged_order: ['p1', 'p2']
-    )
+    @game = example_game(%w(p1 p2), [1, 1, 1, 1, 2, 3, 1])
     @game.draw
     expect(@game.deck_size).to be == 0
 
@@ -166,11 +147,7 @@ RSpec.describe LoveLetter::Game do
 
   # This is a weird test, since it kind of tests interface
   it 'reveals no information when playing a 2 on protected player' do
-    @game.start_game(
-      %w(p1 p2),
-      rigged_deck: [1, 1, 1, 1, 4, 2, 1, 3],
-      rigged_order: ['p1', 'p2']
-    )
+    @game = example_game(%w(p1 p2), [1, 1, 1, 1, 4, 2, 1, 3])
     @game.draw
     expect(@game.deck_size).to be == 1
 
@@ -188,11 +165,7 @@ RSpec.describe LoveLetter::Game do
   # ===== Tests with 3 =====
 
   it 'kills the player who played a 3 if the player loses' do
-    @game.start_game(
-      %w(p1 p2),
-      rigged_deck: [1, 1, 1, 1, 3, 4, 2, 5],
-      rigged_order: ['p1', 'p2']
-    )
+    @game = example_game(%w(p1 p2), [1, 1, 1, 1, 3, 4, 2, 5])
     @game.draw
     expect(@game.deck_size).to be == 1
 
@@ -207,11 +180,7 @@ RSpec.describe LoveLetter::Game do
   end
 
   it 'kills the opponent of the player who played a 3 if the player wins' do
-    @game.start_game(
-      %w(p1 p2),
-      rigged_deck: [1, 1, 1, 1, 3, 2, 4, 5],
-      rigged_order: ['p1', 'p2']
-    )
+    @game = example_game(%w(p1 p2), [1, 1, 1, 1, 3, 2, 4, 5])
     @game.draw
     expect(@game.deck_size).to be == 1
 
@@ -226,11 +195,7 @@ RSpec.describe LoveLetter::Game do
   end
 
   it 'kills neither player when a 3 duel ties' do
-    @game.start_game(
-      %w(p1 p2),
-      rigged_deck: [1, 1, 1, 1, 3, 2, 2, 3],
-      rigged_order: ['p1', 'p2']
-    )
+    @game = example_game(%w(p1 p2), [1, 1, 1, 1, 3, 2, 2, 3])
     @game.draw
     expect(@game.deck_size).to be == 1
 
@@ -245,11 +210,7 @@ RSpec.describe LoveLetter::Game do
   end
 
   it 'does not battle when playing 3 on protected player' do
-    @game.start_game(
-      %w(p1 p2),
-      rigged_deck: [1, 1, 1, 1, 4, 3, 1, 2],
-      rigged_order: ['p1', 'p2']
-    )
+    @game = example_game(%w(p1 p2), [1, 1, 1, 1, 4, 3, 1, 2])
     @game.draw
     expect(@game.deck_size).to be == 1
 
@@ -267,11 +228,7 @@ RSpec.describe LoveLetter::Game do
   end
 
   it 'forbids self-targeting with a 3' do
-    @game.start_game(
-      %w(p1 p2),
-      rigged_deck: [1, 1, 1, 1, 3, 2, 1],
-      rigged_order: ['p1', 'p2']
-    )
+    @game = example_game(%w(p1 p2), [1, 1, 1, 1, 3, 2, 1])
     @game.draw
     expect(@game.deck_size).to be == 0
 
@@ -284,11 +241,7 @@ RSpec.describe LoveLetter::Game do
   # ===== Tests with 4 =====
 
   it 'allows playing 4 without arguments' do
-    @game.start_game(
-      %w(p1 p2),
-      rigged_deck: [1, 1, 1, 1, 4, 2, 1],
-      rigged_order: ['p1', 'p2']
-    )
+    @game = example_game(%w(p1 p2), [1, 1, 1, 1, 4, 2, 1])
     @game.draw
     expect(@game.deck_size).to be == 0
 
@@ -300,11 +253,7 @@ RSpec.describe LoveLetter::Game do
 
   context 'when playing 5 with a many-card deck' do
     before :each do
-      @game.start_game(
-        %w(p1 p2),
-        rigged_deck: [1, 1, 1, 1, 5, 1, 2, 3, 4],
-        rigged_order: ['p1', 'p2']
-      )
+      @game = example_game(%w(p1 p2), [1, 1, 1, 1, 5, 1, 2, 3, 4])
       @game.draw
       expect(@game.deck_size).to be == 2
 
@@ -332,11 +281,7 @@ RSpec.describe LoveLetter::Game do
   context 'when playing 5 with a one-card deck' do
     context 'when playing 5 on self' do
       before :each do
-        @game.start_game(
-          %w(p1 p2),
-          rigged_deck: [1, 1, 1, 1, 5, 2, 1, 3],
-          rigged_order: ['p1', 'p2']
-        )
+        @game = example_game(%w(p1 p2), [1, 1, 1, 1, 5, 2, 1, 3])
         @game.draw
         expect(@game.deck_size).to be == 1
 
@@ -360,11 +305,7 @@ RSpec.describe LoveLetter::Game do
 
     context 'when playing 5 on opponent' do
       before :each do
-        @game.start_game(
-          %w(p1 p2),
-          rigged_deck: [1, 1, 1, 1, 5, 1, 2, 3],
-          rigged_order: ['p1', 'p2']
-        )
+        @game = example_game(%w(p1 p2), [1, 1, 1, 1, 5, 1, 2, 3])
         @game.draw
         expect(@game.deck_size).to be == 1
 
@@ -390,11 +331,7 @@ RSpec.describe LoveLetter::Game do
   context 'when playing 5 with an empty deck' do
     context 'when playing 5 on self' do
       before :each do
-        @game.start_game(
-          %w(p1 p2),
-          rigged_deck: [8, 1, 1, 1, 5, 2, 1],
-          rigged_order: ['p1', 'p2']
-        )
+        @game = example_game(%w(p1 p2), [8, 1, 1, 1, 5, 2, 1])
         @game.draw
         expect(@game.deck_size).to be == 0
 
@@ -418,11 +355,7 @@ RSpec.describe LoveLetter::Game do
 
     context 'when playing 5 on opponent' do
       before :each do
-        @game.start_game(
-          %w(p1 p2),
-          rigged_deck: [8, 1, 1, 1, 5, 1, 2],
-          rigged_order: ['p1', 'p2']
-        )
+        @game = example_game(%w(p1 p2), [8, 1, 1, 1, 5, 1, 2])
         @game.draw
         expect(@game.deck_size).to be == 0
 
@@ -446,11 +379,7 @@ RSpec.describe LoveLetter::Game do
   end
 
   it 'does not discard when playing a 5 on protected player' do
-    @game.start_game(
-      %w(p1 p2),
-      rigged_deck: [1, 1, 1, 1, 4, 5, 1, 2],
-      rigged_order: ['p1', 'p2']
-    )
+    @game = example_game(%w(p1 p2), [1, 1, 1, 1, 4, 5, 1, 2])
     @game.draw
     expect(@game.deck_size).to be == 1
 
@@ -471,11 +400,7 @@ RSpec.describe LoveLetter::Game do
   end
 
   it 'kills a player who self-discards an 8 because of a 5' do
-    @game.start_game(
-      %w(p1 p2),
-      rigged_deck: [1, 1, 1, 1, 5, 1, 8, 2],
-      rigged_order: ['p1', 'p2']
-    )
+    @game = example_game(%w(p1 p2), [1, 1, 1, 1, 5, 1, 8, 2])
     @game.draw
     expect(@game.deck_size).to be == 1
 
@@ -486,11 +411,7 @@ RSpec.describe LoveLetter::Game do
   end
 
   it 'kills an opponent who discards an 8 because of a 5' do
-    @game.start_game(
-      %w(p1 p2),
-      rigged_deck: [1, 1, 1, 1, 5, 8, 1, 2],
-      rigged_order: ['p1', 'p2']
-    )
+    @game = example_game(%w(p1 p2), [1, 1, 1, 1, 5, 8, 1, 2])
     @game.draw
     expect(@game.deck_size).to be == 1
 
@@ -503,11 +424,7 @@ RSpec.describe LoveLetter::Game do
   # ===== Tests with 6 =====
 
   it 'trades hands when playing a 6' do
-    @game.start_game(
-      %w(p1 p2),
-      rigged_deck: [1, 1, 1, 1, 6, 2, 1],
-      rigged_order: ['p1', 'p2']
-    )
+    @game = example_game(%w(p1 p2), [1, 1, 1, 1, 6, 2, 1])
     @game.draw
     expect(@game.deck_size).to be == 0
 
@@ -522,11 +439,7 @@ RSpec.describe LoveLetter::Game do
   end
 
   it 'forbids self-targeting with a 6' do
-    @game.start_game(
-      %w(p1 p2),
-      rigged_deck: [1, 1, 1, 1, 6, 2, 1],
-      rigged_order: ['p1', 'p2']
-    )
+    @game = example_game(%w(p1 p2), [1, 1, 1, 1, 6, 2, 1])
     @game.draw
     expect(@game.deck_size).to be == 0
 
@@ -538,11 +451,7 @@ RSpec.describe LoveLetter::Game do
   end
 
   it 'does not trade hands when playing 6 on protected player' do
-    @game.start_game(
-      %w(p1 p2),
-      rigged_deck: [1, 1, 1, 1, 4, 6, 1, 2],
-      rigged_order: ['p1', 'p2']
-    )
+    @game = example_game(%w(p1 p2), [1, 1, 1, 1, 4, 6, 1, 2])
     @game.draw
     expect(@game.deck_size).to be == 1
 
@@ -565,11 +474,7 @@ RSpec.describe LoveLetter::Game do
   # ===== Tests with 7 =====
 
   it 'allows playing 7 without arguments' do
-    @game.start_game(
-      %w(p1 p2),
-      rigged_deck: [1, 1, 1, 1, 7, 2, 1],
-      rigged_order: ['p1', 'p2']
-    )
+    @game = example_game(%w(p1 p2), [1, 1, 1, 1, 7, 2, 1])
     @game.draw
     expect(@game.deck_size).to be == 0
 
@@ -579,12 +484,7 @@ RSpec.describe LoveLetter::Game do
 
   context 'when a player holds 12+ with 7 in hand' do
     before :each do
-      @game.minister_death = true
-      @game.start_game(
-        %w(p1 p2),
-        rigged_deck: [1, 1, 1, 1, 7, 1, 5, 2],
-        rigged_order: ['p1', 'p2']
-      )
+      @game = example_game(%w(p1 p2), [1, 1, 1, 1, 7, 1, 5, 2], minister_death: true)
       @game.draw
       expect(@game.deck_size).to be == 1
     end
@@ -600,12 +500,7 @@ RSpec.describe LoveLetter::Game do
   end
 
   it 'forces players who hold 12+ with 7 in hand to play 7' do
-    @game.minister_death = false
-    @game.start_game(
-      %w(p1 p2),
-      rigged_deck: [1, 1, 1, 1, 7, 1, 5],
-      rigged_order: ['p1', 'p2']
-    )
+    @game = example_game(%w(p1 p2), [1, 1, 1, 1, 7, 1, 5], minister_death: false)
     @game.draw
     expect(@game.deck_size).to be == 0
 
@@ -627,11 +522,7 @@ RSpec.describe LoveLetter::Game do
 
   context 'when a player plays an 8' do
     before :each do
-      @game.start_game(
-        %w(p1 p2),
-        rigged_deck: [1, 1, 1, 1, 8, 1, 2, 2],
-        rigged_order: ['p1', 'p2']
-      )
+      @game = example_game(%w(p1 p2), [1, 1, 1, 1, 8, 1, 2, 2])
       @game.draw
       expect(@game.deck_size).to be == 1
 

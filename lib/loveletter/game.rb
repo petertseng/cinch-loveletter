@@ -35,30 +35,16 @@ module LoveLetter; class Game
 
   attr_reader :channel_name
   attr_reader :round
-  attr_reader :in_progress
 
-  attr_accessor :goal_score
-  attr_accessor :minister_death
+  attr_reader :goal_score, :minister_death
 
-  alias :in_progress? :in_progress
-  alias :started? :in_progress
-
-  def initialize(channel_name)
+  def initialize(channel_name, users, goal_score: 1, minister_death: false, rigged_deck: nil, rigged_order: nil)
     @channel_name = channel_name
 
-    @goal_score = 1
-    @minister_death = false
+    @goal_score = goal_score
+    @minister_death = minister_death
 
-    reset
-  end
-
-  def reset
-    @in_progress = false
-  end
-
-  def start_game(users, rigged_deck: nil, rigged_order: nil)
     @players = users.map { |user| [user, Player.new(user)] }.to_h
-    @in_progress = true
     @round = 0
 
     @player_order = @players.values

@@ -38,18 +38,21 @@ module Cinch; module Plugins; class LoveLetter < GameBot
   # Implementing classes should override these
   #--------------------------------------------------------------------------------
 
-  def game_class
-    ::LoveLetter::Game
-  end
+  def min_players; ::LoveLetter::Game::MIN_PLAYERS end
+  def max_players; ::LoveLetter::Game::MAX_PLAYERS end
+  def game_name; ::LoveLetter::Game::GAME_NAME end
 
-  def do_start_game(m, game, players, options)
-    game.start_game(players.map(&:user))
-    channel = Channel(game.channel_name)
+  def do_start_game(m, channel_name, players, settings, start_args)
+    opts = {}
+    opts[:minister_death] = settings[:minister_death] if settings.has_key?(:minister_death)
+    opts[:goal_score] = settings[:goal_score] if settings.has_key?(:goal_score)
+    game = ::LoveLetter::Game.new(channel_name, players.map(&:user), **opts)
+    channel = Channel(channel_name)
     channel.send('The game has started. Settings: ' + game_settings(game))
     channel.send("Turn order: #{game.player_order.join(', ')}")
 
     step(game, channel, -1)
-    true
+    game
   end
 
   def do_reset_game(game)
@@ -67,60 +70,67 @@ module Cinch; module Plugins; class LoveLetter < GameBot
   GOAL_REGEX = /goal(\d+)/
 
   def game_settings(game)
-    minister_result = game.minister_death ? 'knockout' : 'discard'
-    "Play to #{game.goal_score} points. " +
+    format_settings(game.goal_score, game.minister_death)
+  end
+
+  def waiting_room_settings(waiting_room)
+    format_settings(waiting_room.settings[:goal_score] || 1, waiting_room.settings[:minister_death])
+  end
+
+  def format_settings(goal_score, minister_death)
+    minister_result = minister_death ? 'knockout' : 'discard'
+    "Play to #{goal_score} points. " +
     "12+ with 7 in hand causes #{minister_result}."
   end
 
   def get_settings(m, channel_name = nil)
-    game = self.game_of(m, channel_name, ['see settings', '!settings'])
-    return unless game
+    if (game = self.game_of(m, channel_name))
+      m.reply('Current game settings: ' + game_settings(game))
+      return
+    end
 
-    m.reply('Current game settings: ' + game_settings(game))
+    waiting_room = self.waiting_room_of(m, channel_name, ['see settings', '!settings'])
+    return unless waiting_room
+    m.reply('Next game settings: ' + waiting_room_settings(waiting_room))
   end
 
   def set_settings(m, channel_name = nil, args = '')
-    game = self.game_of(m, channel_name, ['change settings', '!settings'])
-    return unless game
-
-    if game.started?
-      m.reply('Game is already in progress.', true)
-      return
-    end
+    waiting_room = self.waiting_room_of(m, channel_name, ['change settings', '!settings'])
+    return unless waiting_room
 
     unknown_arg = false
     args.strip.split.each { |arg|
       if match = GOAL_REGEX.match(arg)
-        game.goal_score = match[1].to_i
+        waiting_room.settings[:goal_score] = match[1].to_i
       elsif arg == '7death'
-        game.minister_death = true
+        waiting_room.settings[:minister_death] = true
       elsif arg == '7discard'
-        game.minister_death = false
+        waiting_room.settings[:minister_death] = false
       else
         unknown_arg = true
       end
     }
 
-    channel = Channel(game.channel_name)
+    channel = Channel(waiting_room.channel_name)
     same_origin = m.channel == channel
     m.reply('Unrecognized settings. ' +
             'Valid settings: goalN, 7death, 7discard') if unknown_arg
     prefix = same_origin ?
-      'The game has been changed to: ' :
-      (m.user.name + ' has changed the game to: ')
-    channel.send(prefix + game_settings(game))
+      'The next game has been changed to: ' :
+      (m.user.name + ' has changed the next game to: ')
+    channel.send(prefix + waiting_room_settings(waiting_room))
   end
 
   def player_history(m)
     game = self.game_of(m)
-    return unless game && game.started? && game.users.include?(m.user)
+    return unless game && game.users.include?(m.user)
 
     m.reply(game.player_history)
   end
 
   def play_card(m, card, args)
     game = self.game_of(m)
-    return unless game && game.started? && game.users.include?(m.user)
+    return unless game && game.users.include?(m.user)
 
     success, pubtext, privtext = game.play_card(m.user, card, args)
 
