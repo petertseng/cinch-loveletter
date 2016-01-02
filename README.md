@@ -1,5 +1,7 @@
 # Cinch-LoveLetter - Love Letter plugin
 
+[![Build Status](https://travis-ci.org/petertseng/cinch-loveletter.svg?branch=master)](https://travis-ci.org/petertseng/cinch-loveletter)
+
 ## Description
 
 This is an IRC bot using [cinch](https://github.com/cinchrb/cinch) and [cinch-game-bot](https://github.com/petertseng/cinch-game-bot) to allow play-by-IRC of [Love Letter](http://boardgamegeek.com/boardgame/129622/love-letter)
