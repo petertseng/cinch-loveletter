@@ -6,9 +6,18 @@
 
 This is an IRC bot using [cinch](https://github.com/cinchrb/cinch) and [cinch-game-bot](https://github.com/petertseng/cinch-game-bot) to allow play-by-IRC of [Love Letter](http://boardgamegeek.com/boardgame/129622/love-letter)
 
+## Setup
+
+You'll need a recent version of [Ruby](https://www.ruby-lang.org/).
+Ruby 2.1 or newer is required because of the `Array#to_h` method.
+The [build status](https://travis-ci.org/petertseng/cinch-loveletter) will confirm compatibility with various Ruby versions.
+Note that [2.1 is in security maintenance mode](https://www.ruby-lang.org/en/news/2016/02/24/support-plan-of-ruby-2-0-0-and-2-1/), so it would be better to use a later version.
+
+You'll need to install the required gems, which can be done automatically via `bundle install`, or manually by reading the `Gemfile` and using `gem install` on each gem listed.
+
 ## Usage
 
-Here's an example of what your *bot.rb* might look like:
+Given that you have performed the requisite setup, the minimal code to get a working bot might resemble:
 
 ```ruby
 require 'cinch'
