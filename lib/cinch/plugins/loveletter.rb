@@ -22,6 +22,8 @@ module Cinch; module Plugins; class LoveLetter < GameBot
   match(/settings(?:\s+(##?\w+))?$/i, method: :get_settings)
   match(/settings(?:\s+(##?\w+))? (.+)$/i, method: :set_settings)
 
+  match(/me/i, method: :whoami)
+  match(/whoami/i, method: :whoami)
   match(/players/i, method: :player_history)
 
   match(/play\s+(\w+)(?:\s+(.*))?/i, method: :play_card)
@@ -32,6 +34,7 @@ module Cinch; module Plugins; class LoveLetter < GameBot
     m.reply('!join, !leave, !start, !play: Do the obvious.')
     m.reply('!settings [args]: Without arguments, displays current settings. With arguments (goalX, 7death, 7discard) changes settings.')
     m.reply('!players: Shows history of cards played this round.')
+    m.reply('!me: Shows you your own hand.')
   end
 
   #--------------------------------------------------------------------------------
@@ -119,6 +122,14 @@ module Cinch; module Plugins; class LoveLetter < GameBot
       'The next game has been changed to: ' :
       (m.user.name + ' has changed the next game to: ')
     channel.send(prefix + waiting_room_settings(waiting_room))
+  end
+
+  def whoami(m)
+    game = self.game_of(m)
+    return unless game && game.users.include?(m.user)
+
+    hand = game.hand(m.user).map(&:short_help).join(' and ')
+    m.user.send("Your hand is #{hand}")
   end
 
   def player_history(m)
